@@ -816,7 +816,7 @@ class ICloudBackend implements EmailBackend {
    * File a copy of a just-sent message in Sent Messages.
    *
    * SMTP delivery leaves no trace in the mailbox, so without this an iCloud
-   * send vanishes from Lincoln's own history (Gmail needs no equivalent: the
+   * send vanishes from the sender's own history (Gmail needs no equivalent: the
    * API files sent mail itself). Best-effort by design: the mail is already
    * delivered by the time we get here, so an IMAP failure must never turn a
    * successful send into a thrown error. Returns whether the copy landed.
@@ -917,7 +917,7 @@ export function icloudBackend(creds: ICloudCreds): EmailBackend {
 /**
  * The whole INBOX (read + unread) + its UIDVALIDITY in one connection — used by
  * the triage sweep (triage.ts), whose queue is "anything in the inbox"
- * (Lincoln, 2026-06-11), keyed on UIDs (the validity guards renumbering).
+ * keyed on UIDs (the validity guards renumbering).
  * Read path only (fetch uses BODY.PEEK; flags untouched). INBOX ids stay bare,
  * so triage-state keys are unchanged.
  */

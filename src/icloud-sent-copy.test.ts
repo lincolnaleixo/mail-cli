@@ -43,8 +43,7 @@ function resolveSent(boxes: { path: string; specialUse?: string }[]): Promise<st
 
 describe('iCloud Sent mailbox resolution', () => {
   test('prefers "Sent Messages" over the empty \\Sent-flagged "Sent Items"', async () => {
-    // Lincoln's real account shape: Sent Items carries \Sent but holds 0
-    // messages, while Sent Messages holds every mail he has ever sent.
+    // Some servers expose an empty \\Sent mailbox alongside Sent Messages.
     expect(
       await resolveSent([
         { path: 'INBOX', specialUse: '\\Inbox' },
