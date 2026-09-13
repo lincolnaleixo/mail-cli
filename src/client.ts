@@ -6,7 +6,7 @@
  *                        ambiguous (errors) for archive/trash/draft/send.
  *   gmail              → gmail-personal only.
  *   icloud             → icloud only.
- *   lln|company|empresa|longlifenutri → gmail-lln only.
+ *   lln|company → the additional Gmail account only.
  *
  * The canonical keyword→account map lives in SKILL.md (ACCOUNT ROUTING); keep
  * the two in sync.
@@ -34,9 +34,9 @@ export function normalizeSelector(raw: string): 'personal' | Account {
   if (s === 'personal') return 'personal';
   if (s === 'gmail' || s === 'google') return 'gmail';
   if (s === 'icloud') return 'icloud';
-  if (s === 'lln' || s === 'company' || s === 'empresa' || s === 'longlifenutri') return 'lln';
+  if (s === 'lln' || s === 'company') return 'lln';
   throw new Error(
-    `unknown account "${raw}". Use one of: personal | gmail | icloud | lln (aliases: company, empresa, longlifenutri)`,
+    `unknown account "${raw}". Use one of: personal | gmail | icloud | lln (alias: company)`,
   );
 }
 
@@ -64,7 +64,7 @@ function writeBackend(selector: string, op: string): EmailBackend {
   if (n === 'personal') {
     throw new Error(
       `--account personal is ambiguous for "${op}". Pick an explicit account: ` +
-        `gmail or icloud (or lln/company for LongLifeNutri).`,
+        `gmail, icloud, or lln (company).`,
     );
   }
   return makeBackend(n);
@@ -162,8 +162,8 @@ export async function replyEmail(
 /**
  * Second route for an outgoing message when its own account cannot send.
  *
- * iCloud's SMTP is the flaky one (2026-08-18: hours of IMAP and connection
- * faults), and Lincoln's Gmail can carry the message instead. Gmail and LLN have
+ * iCloud's SMTP can be unavailable, and the primary Gmail account can carry the
+ * message instead. Gmail accounts have no fallback: they are the fallback.
  * no fallback: they are the fallback.
  */
 const SEND_FALLBACK: Partial<Record<Account, Account>> = { icloud: 'gmail' };

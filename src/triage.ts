@@ -1,19 +1,19 @@
 /**
  * Email triage sweep: the email capture mouth.
  *
- * The queue is **anything in the inbox** — read or unread (Lincoln, 2026-06-11:
+ * The queue is **anything in the inbox** — read or unread:
  * read-but-not-archived mail was invisible to the original unread-only sweep
  * and piled up). Two operations, both driven from cli.ts:
  *   triage-sweep — list every INBOX message across all three accounts, minus
- *                  ids already recorded in System local state. READ-ONLY:
+ *                  ids already recorded in local state. READ-ONLY:
  *                  never marks read, archives, moves, or deletes (Gmail
  *                  messages.get and ImapFlow BODY.PEEK are mutation-free).
  *   triage-mark  — record ids that were routed but should STAY in the inbox.
- *                  The default triage completion is `archive` (after Lincoln's
- *                  per-item OK), which empties the queue by itself; the mark is
+ *                  The default triage completion is `archive` (after operator
+ *                  authorization), which empties the queue by itself; the mark is
  *                  the dedup for the keep-in-inbox cases.
  *
- * State: ~/.local/state/life-system/email/triage-state.json. Per account:
+ * State: `$MAIL_CLI_STATE_DIR/email/triage-state.json`, or the XDG default. Per account:
  * { lastSweep, processed: { id → date-marked } };
  * icloud additionally records the INBOX UIDVALIDITY — IMAP UIDs are only stable
  * within one validity epoch, so on change the icloud map is cleared with a
@@ -29,8 +29,7 @@ import { gmailLlnCreds, gmailPersonalCreds, icloudCreds } from './creds';
 import type { Email } from './types';
 
 const STATE_PATH = join(
-  process.env.XDG_STATE_HOME || join(homedir(), '.local', 'state'),
-  'life-system',
+  process.env.MAIL_CLI_STATE_DIR || join(process.env.XDG_STATE_HOME || join(homedir(), '.local', 'state'), 'mail-cli'),
   'email',
   'triage-state.json',
 );

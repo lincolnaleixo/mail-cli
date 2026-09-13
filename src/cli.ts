@@ -1,17 +1,5 @@
 #!/usr/bin/env bun
-/**
- * Email skill CLI — read + send across Lincoln's three accounts.
- *
- *   system-vault run inbox_triage -- bun scripts/email-cli.js <command> [args] [--account <sel>]
- *
- * Accounts (see SKILL.md → ACCOUNT ROUTING):
- *   personal (default)  gmail + icloud (reads fan; writes must pick one)
- *   gmail               lincolnmorais@gmail.com
- *   icloud              lincolnmorais@icloud.com
- *   lln|company|empresa lincoln@longlifenutri.com
- *
- * Creds: System Vault profile "inbox_triage".
- */
+/** Email CLI for Gmail and iCloud accounts. */
 
 import { readFileSync } from 'fs';
 import {
@@ -36,7 +24,7 @@ import type { Email, OutgoingMessage, SearchOptions } from './types';
 import { markProcessed, sweep, TRIAGE_ACCOUNTS, type TriageAccount } from './triage';
 
 const SCRATCH_DIR =
-  process.env.CLAUDE_SCRATCHPAD ||
+  process.env.MAIL_CLI_SCRATCH_DIR ||
   process.env.TMPDIR || '/tmp';
 
 function die(msg: string): never {
@@ -205,17 +193,16 @@ function loadReplyPayload(path: string | undefined): ReplyInput {
   return payload;
 }
 
-const HELP = `email — read + send across Lincoln's three accounts
+const HELP = `email — read and send across configured accounts
 
 Usage:
-  system-vault run inbox_triage -- bun scripts/email-cli.js <command> [args] [--account <sel>]
+  mail-cli <command> [args] [--account <selector>]
 
 Account selectors (--account, default: personal):
   personal              gmail + icloud — reads fan across both; writes must pick one
-  gmail                 lincolnmorais@gmail.com   (Gmail API)
-  icloud                lincolnmorais@icloud.com or authorized custom sender
-                        contact@bakeitfun.com (IMAP + SMTP)
-  lln | company | empresa | longlifenutri   lincoln@longlifenutri.com (Gmail API)
+  gmail                 Gmail API account
+  icloud                IMAP + SMTP account
+  lln                   Additional Gmail API account
 
 Commands:
   inbox [limit]         List inbox (default 20)
@@ -243,11 +230,11 @@ Commands:
   triage-sweep [--limit N] [--json]
                         Mailbox-read-only: EVERYTHING in the inbox (read + unread) across ALL 3
                         accounts, minus already-triaged ids
-                        (~/.local/state/life-system/email/triage-state.json). The sweep itself is
+                        (under the configured state directory). The sweep itself is
                         mailbox-read-only but updates that local dedup state. Default limit 50/account.
   triage-mark <account> <id> [<id>…]
                         Record ids routed but KEPT in the inbox (the default
-                        completion is archive, after Lincoln's OK).
+                        completion is archive, after operator authorization).
                         account: gmail|lln|icloud
   help                  Show this help
 
@@ -277,17 +264,16 @@ JSON payload (reply): { "body", "html"?, "from"?, "to"?, "cc"?, "bcc"?, "subject
 --json works on: inbox, unread, search, read, thread, folders, attachments.
 
 Examples:
-  bun .../cli.ts inbox --account gmail 5
-  bun .../cli.ts unread --account personal 10
-  bun .../cli.ts search "from:amazon" --account lln
-  bun .../cli.ts search "Hotel am Park" --account icloud
-  bun .../cli.ts search "body:Housekeeping" --account icloud --body
-  bun .../cli.ts search --from booking --since 2026/6/1 --account personal
-  bun .../cli.ts thread 19eab63374caa928 --account gmail
-  bun .../cli.ts attachments Archive:48213 --out ./tmp --account icloud
-  bun .../cli.ts read 18d1234abcd --account gmail
-  bun .../cli.ts draft /tmp/draft.json --account icloud
-  bun .../cli.ts reply 19eab63374caa928 /tmp/reply.json --account gmail
+  mail-cli inbox --account gmail 5
+  mail-cli unread --account personal 10
+  mail-cli search "from:sender@example.test" --account lln
+  mail-cli search "subject:example" --account icloud
+  mail-cli search --from sender@example.test --since 2026/6/1 --account personal
+  mail-cli thread MESSAGE_ID --account gmail
+  mail-cli attachments FOLDER:MESSAGE_ID --out ./tmp --account icloud
+  mail-cli read MESSAGE_ID --account gmail
+  mail-cli draft ./draft.json --account icloud
+  mail-cli reply MESSAGE_ID ./reply.json --account gmail
 `;
 
 async function main() {

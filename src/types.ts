@@ -1,7 +1,7 @@
 /**
- * Email skill — shared types.
+ * Shared email types.
  *
- * One skill, three accounts, two backends:
+ * Three configured accounts, two backends:
  *   - gmail-personal + gmail-lln  → Gmail REST API (OAuth refresh token)
  *   - icloud                      → IMAP read (imapflow) + SMTP send (nodemailer)
  */
@@ -14,17 +14,14 @@ export type Provider = 'gmail' | 'icloud';
 
 /**
  * What the caller types after `--account`. `personal` is the default and fans
- * across gmail + icloud for reads; `company`/`empresa`/`longlifenutri` are
- * aliases for `lln`. Resolved by `resolveAccounts` in client.ts.
+ * across gmail + icloud for reads. Resolved by client.ts.
  */
 export type AccountSelector =
   | 'personal'
   | 'gmail'
   | 'icloud'
   | 'lln'
-  | 'company'
-  | 'empresa'
-  | 'longlifenutri';
+  | 'company';
 
 /** Attachment metadata (no bytes) — surfaced on read across both backends. */
 export interface AttachmentMeta {
@@ -175,7 +172,7 @@ export interface EmailBackend {
   downloadAttachment(id: string, index: number, outDir: string): Promise<string>;
 }
 
-// ---- Credential shapes (System Vault profile "inbox_triage") ----
+// ---- Credential shapes ----
 
 export interface GmailAccountCreds {
   client_id: string;

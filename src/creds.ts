@@ -1,11 +1,4 @@
-/**
- * Credential loader for the email skill.
- *
- * Credentials are injected into this process by the audited System Vault client:
- *   system-vault run inbox_triage -- bun ...
- *
- * Secret values stay in the child environment and are never written to disk.
- */
+/** Load provider credentials and mailbox identities from the environment. */
 
 import type { GmailAccountCreds, ICloudCreds } from './types';
 
@@ -16,7 +9,7 @@ let cachedIcloud: ICloudCreds | null = null;
 function required(name: string): string {
   const value = process.env[name];
   if (!value) {
-    throw new Error(`missing ${name}; run through: system-vault run inbox_triage -- bun ...`);
+    throw new Error(`missing required environment variable: ${name}`);
   }
   return value;
 }
@@ -27,7 +20,7 @@ export function gmailPersonalCreds(): GmailAccountCreds {
       client_id: required('GMAIL_PERSONAL_CLIENT_ID'),
       client_secret: required('GMAIL_PERSONAL_CLIENT_SECRET'),
       refresh_token: required('GMAIL_PERSONAL_REFRESH_TOKEN'),
-      email: 'lincolnmorais@gmail.com',
+      email: required('GMAIL_PERSONAL_EMAIL'),
     };
   }
   return cachedGmailPersonal;
@@ -39,7 +32,7 @@ export function gmailLlnCreds(): GmailAccountCreds {
       client_id: required('GMAIL_LLN_CLIENT_ID'),
       client_secret: required('GMAIL_LLN_CLIENT_SECRET'),
       refresh_token: required('GMAIL_LLN_REFRESH_TOKEN'),
-      email: 'lincoln@longlifenutri.com',
+      email: required('GMAIL_LLN_EMAIL'),
     };
   }
   return cachedGmailLln;
@@ -48,12 +41,12 @@ export function gmailLlnCreds(): GmailAccountCreds {
 export function icloudCreds(): ICloudCreds {
   if (!cachedIcloud) {
     cachedIcloud = {
-      email: 'lincolnmorais@icloud.com',
-      sendFrom: ['contact@bakeitfun.com'],
-      imapServer: 'imap.mail.me.com',
-      imapPort: 993,
-      smtpServer: 'smtp.mail.me.com',
-      smtpPort: 587,
+      email: required('ICLOUD_EMAIL'),
+      sendFrom: required('ICLOUD_SEND_FROM').split(',').map((value) => value.trim()).filter(Boolean),
+      imapServer: process.env.ICLOUD_IMAP_SERVER || 'imap.mail.me.com',
+      imapPort: Number(process.env.ICLOUD_IMAP_PORT || 993),
+      smtpServer: process.env.ICLOUD_SMTP_SERVER || 'smtp.mail.me.com',
+      smtpPort: Number(process.env.ICLOUD_SMTP_PORT || 587),
       appSpecificPassword: required('ICLOUD_APP_PASSWORD'),
     };
   }
