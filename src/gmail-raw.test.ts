@@ -71,7 +71,7 @@ describe('buildRaw — header injection', () => {
 
 describe('buildRaw — attachments', () => {
   const withFile = (extra: Partial<OutgoingMessage> = {}): string => {
-    const path = `${import.meta.dir}/../../SKILL.md`;
+    const path = `${import.meta.dir}/../README.md`;
     const raw = buildRaw({ ...base, attachments: [{ path }], ...extra }, 'me@example.com');
     return Buffer.from(raw, 'base64url').toString('utf-8');
   };
@@ -79,12 +79,12 @@ describe('buildRaw — attachments', () => {
   test('wraps the message in multipart/mixed with the file base64-encoded', () => {
     const decoded = withFile();
     expect(decoded).toContain('multipart/mixed');
-    expect(decoded).toContain('Content-Disposition: attachment; filename="SKILL.md"');
-    expect(decoded).toContain('Content-Type: text/markdown; name="SKILL.md"');
+    expect(decoded).toContain('Content-Disposition: attachment; filename="README.md"');
+    expect(decoded).toContain('Content-Type: text/markdown; name="README.md"');
     // The attachment body must round-trip to the real file bytes.
-    const b64 = decoded.split('Content-Disposition: attachment; filename="SKILL.md"')[1]!
+    const b64 = decoded.split('Content-Disposition: attachment; filename="README.md"')[1]!
       .split('\r\n\r\n')[1]!.split('\r\n--')[0]!.replace(/\r\n/g, '');
-    expect(Buffer.from(b64, 'base64').toString()).toContain('name: email');
+    expect(Buffer.from(b64, 'base64').toString()).toContain('# mail-cli');
   });
 
   test('keeps multipart/alternative nested inside multipart/mixed when html is set', () => {

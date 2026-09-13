@@ -202,7 +202,7 @@ Account selectors (--account, default: personal):
   personal              gmail + icloud — reads fan across both; writes must pick one
   gmail                 Gmail API account
   icloud                IMAP + SMTP account
-  lln                   Additional Gmail API account
+  secondary                   Additional Gmail API account
 
 Commands:
   inbox [limit]         List inbox (default 20)
@@ -235,7 +235,7 @@ Commands:
   triage-mark <account> <id> [<id>…]
                         Record ids routed but KEPT in the inbox (the default
                         completion is archive, after operator authorization).
-                        account: gmail|lln|icloud
+                        account: gmail|secondary|icloud
   help                  Show this help
 
 Search scope: icloud now searches EVERY selectable folder (INBOX, Archive,
@@ -266,7 +266,7 @@ JSON payload (reply): { "body", "html"?, "from"?, "to"?, "cc"?, "bcc"?, "subject
 Examples:
   mail-cli inbox --account gmail 5
   mail-cli unread --account personal 10
-  mail-cli search "from:sender@example.test" --account lln
+  mail-cli search "from:sender@example.test" --account secondary
   mail-cli search "subject:example" --account icloud
   mail-cli search --from sender@example.test --since 2026/6/1 --account personal
   mail-cli thread MESSAGE_ID --account gmail
@@ -337,7 +337,7 @@ async function main() {
     }
     case 'thread': {
       const id = args[0];
-      if (!id) die('usage: thread <id> [--account <gmail|icloud|lln>]');
+      if (!id) die('usage: thread <id> [--account <gmail|icloud|secondary>]');
       const emails = await threadEmails(account, id);
       if (wantJson) { console.log(JSON.stringify(emails.map(emailToJson), null, 2)); break; }
       console.log(`\nThread (${emails.length} message(s), account: ${account})\n`);
@@ -361,7 +361,7 @@ async function main() {
     }
     case 'attachments': {
       const id = args[0];
-      if (!id) die('usage: attachments <id> [--out <dir>] [--account <gmail|icloud|lln>]');
+      if (!id) die('usage: attachments <id> [--out <dir>] [--account <gmail|icloud|secondary>]');
       if (flags.out !== undefined) {
         const outDir = flags.out ? String(flags.out) : SCRATCH_DIR;
         const { account: acct, paths } = await downloadAttachments(account, id, outDir);
@@ -377,33 +377,33 @@ async function main() {
       break;
     }
     case 'archive': {
-      requireArgs('archive', args, 1, 'archive <id> --account <gmail|icloud|lln>');
+      requireArgs('archive', args, 1, 'archive <id> --account <gmail|icloud|secondary>');
       const id = args[0];
-      if (!id) die('usage: archive <id> --account <gmail|icloud|lln>');
+      if (!id) die('usage: archive <id> --account <gmail|icloud|secondary>');
       await archiveEmail(account, id);
       console.log(`Email ${id} archived (${account}).`);
       break;
     }
     case 'move': {
-      requireArgs('move', args, 2, 'move <id> <folder> --account <gmail|icloud|lln>');
+      requireArgs('move', args, 2, 'move <id> <folder> --account <gmail|icloud|secondary>');
       const [id, destination] = args;
       if (!id || !destination) {
-        die('usage: move <id> <folder> --account <gmail|icloud|lln>');
+        die('usage: move <id> <folder> --account <gmail|icloud|secondary>');
       }
       await moveEmail(account, id, destination);
       console.log(`Email ${id} moved to ${destination} (${account}).`);
       break;
     }
     case 'trash': {
-      requireArgs('trash', args, 1, 'trash <id> --account <gmail|icloud|lln>');
+      requireArgs('trash', args, 1, 'trash <id> --account <gmail|icloud|secondary>');
       const id = args[0];
-      if (!id) die('usage: trash <id> --account <gmail|icloud|lln>');
+      if (!id) die('usage: trash <id> --account <gmail|icloud|secondary>');
       await trashEmail(account, id);
       console.log(`Email ${id} moved to trash (${account}).`);
       break;
     }
     case 'draft': {
-      requireArgs('draft', args, 1, 'draft <json-file> --account <gmail|icloud|lln>');
+      requireArgs('draft', args, 1, 'draft <json-file> --account <gmail|icloud|secondary>');
       const payload = loadPayload(args[0]);
       const res = await draftEmail(account, payload);
       console.log(`Draft created (${account}).`);
@@ -412,9 +412,9 @@ async function main() {
       break;
     }
     case 'reply': {
-      requireArgs('reply', args, 2, 'reply <id> <json-file> --account <gmail|icloud|lln>');
+      requireArgs('reply', args, 2, 'reply <id> <json-file> --account <gmail|icloud|secondary>');
       const [id, file] = args;
-      if (!id) die('usage: reply <id> <json-file> --account <gmail|icloud|lln>');
+      if (!id) die('usage: reply <id> <json-file> --account <gmail|icloud|secondary>');
       const res = await replyEmail(account, id, loadReplyPayload(file));
       console.log(`Reply drafted (${res.account}).`);
       console.log(`  Draft ID:   ${res.draft.draftId}`);
@@ -435,7 +435,7 @@ async function main() {
     }
     case 'send': {
       assertSendConfirmed(flags);
-      requireArgs('send', args, 1, 'send <json-file> --confirm-send --account <gmail|icloud|lln>');
+      requireArgs('send', args, 1, 'send <json-file> --confirm-send --account <gmail|icloud|secondary>');
       const payload = loadPayload(args[0]);
       const res = await sendEmail(account, payload, flags['allow-fallback'] === true);
       console.log(`Message sent (${res.sentVia ?? account}).`);
@@ -487,7 +487,7 @@ async function main() {
       const acct = args[0] as TriageAccount;
       const ids = args.slice(1);
       if (!TRIAGE_ACCOUNTS.includes(acct) || !ids.length) {
-        die('usage: triage-mark <gmail|lln|icloud> <id> [<id>…]');
+        die('usage: triage-mark <gmail|secondary|icloud> <id> [<id>…]');
       }
       const res = markProcessed(acct, ids);
       console.log(`Marked ${res.marked} id(s) processed for ${acct} (map: ${res.total}${res.pruned ? `, pruned ${res.pruned} old` : ''}).`);

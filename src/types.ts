@@ -2,12 +2,12 @@
  * Shared email types.
  *
  * Three configured accounts, two backends:
- *   - gmail-personal + gmail-lln  → Gmail REST API (OAuth refresh token)
+ *   - gmail-personal + gmail-secondary  → Gmail REST API (OAuth refresh token)
  *   - icloud                      → IMAP read (imapflow) + SMTP send (nodemailer)
  */
 
 /** A concrete account that maps to exactly one mailbox/backend. */
-export type Account = 'gmail' | 'lln' | 'icloud';
+export type Account = 'gmail' | 'secondary' | 'icloud';
 
 /** Backend family behind an account. */
 export type Provider = 'gmail' | 'icloud';
@@ -20,7 +20,7 @@ export type AccountSelector =
   | 'personal'
   | 'gmail'
   | 'icloud'
-  | 'lln'
+  | 'secondary'
   | 'company';
 
 /** Attachment metadata (no bytes) — surfaced on read across both backends. */
@@ -194,6 +194,6 @@ export interface ICloudCreds {
 
 export interface EmailCreds {
   'gmail-personal': GmailAccountCreds;
-  'gmail-lln': GmailAccountCreds;
+  'gmail-secondary': GmailAccountCreds;
   icloud: ICloudCreds;
 }

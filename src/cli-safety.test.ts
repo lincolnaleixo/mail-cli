@@ -13,8 +13,8 @@ describe('email CLI safety', () => {
   });
 
   test('send confirmation is an explicit boolean flag', () => {
-    const parsed = parseFlags(['send', '/tmp/message.json', '--account', 'lln', '--confirm-send']);
-    expect(parsed.account).toBe('lln');
+    const parsed = parseFlags(['send', '/tmp/message.json', '--account', 'secondary', '--confirm-send']);
+    expect(parsed.account).toBe('secondary');
     expect(parsed.flags['confirm-send']).toBe(true);
     expect(parsed.positional).toEqual(['send', '/tmp/message.json']);
   });

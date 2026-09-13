@@ -6,7 +6,7 @@
  *                        ambiguous (errors) for archive/trash/draft/send.
  *   gmail              → gmail-personal only.
  *   icloud             → icloud only.
- *   lln|company → the additional Gmail account only.
+ *   secondary|company → the additional Gmail account only.
  *
  * The canonical keyword→account map lives in SKILL.md (ACCOUNT ROUTING); keep
  * the two in sync.
@@ -14,7 +14,7 @@
 
 import { gmailBackend } from './gmail';
 import { icloudBackend } from './icloud';
-import { gmailLlnCreds, gmailPersonalCreds, icloudCreds } from './creds';
+import { gmailSecondaryCreds, gmailPersonalCreds, icloudCreds } from './creds';
 import { buildReply, type ReplyInput } from './reply';
 import { isRetryableSendFailure } from './transient';
 import type {
@@ -34,9 +34,9 @@ export function normalizeSelector(raw: string): 'personal' | Account {
   if (s === 'personal') return 'personal';
   if (s === 'gmail' || s === 'google') return 'gmail';
   if (s === 'icloud') return 'icloud';
-  if (s === 'lln' || s === 'company') return 'lln';
+  if (s === 'secondary' || s === 'company') return 'secondary';
   throw new Error(
-    `unknown account "${raw}". Use one of: personal | gmail | icloud | lln (alias: company)`,
+    `unknown account "${raw}". Use one of: personal | gmail | icloud | secondary (alias: company)`,
   );
 }
 
@@ -44,8 +44,8 @@ function makeBackend(account: Account): EmailBackend {
   switch (account) {
     case 'gmail':
       return gmailBackend('gmail', gmailPersonalCreds());
-    case 'lln':
-      return gmailBackend('lln', gmailLlnCreds());
+    case 'secondary':
+      return gmailBackend('secondary', gmailSecondaryCreds());
     case 'icloud':
       return icloudBackend(icloudCreds());
   }
@@ -64,7 +64,7 @@ function writeBackend(selector: string, op: string): EmailBackend {
   if (n === 'personal') {
     throw new Error(
       `--account personal is ambiguous for "${op}". Pick an explicit account: ` +
-        `gmail, icloud, or lln (company).`,
+        `gmail, icloud, or secondary (company).`,
     );
   }
   return makeBackend(n);

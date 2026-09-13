@@ -1,5 +1,5 @@
 /**
- * Gmail backend — used by both gmail-personal and gmail-lln accounts.
+ * Gmail backend — used by both gmail-personal and gmail-secondary accounts.
  *
  * Calls the Gmail REST API directly using an OAuth refresh token. Keeping this
  * adapter dependency-free makes the installed cross-harness skill portable.

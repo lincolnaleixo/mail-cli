@@ -18,7 +18,7 @@ Run the executable directly with `./bin/mail-cli`, or put the repository's
 
 ## Commands
 
-All commands accept `--account <personal|gmail|icloud|lln>` where relevant.
+All commands accept `--account <personal|gmail|icloud|secondary>` where relevant.
 The `personal` selector reads from its configured Gmail and iCloud accounts;
 writes require an explicit provider account.
 
@@ -57,7 +57,7 @@ put secret values in command arguments.
 Required Gmail variables:
 
 * `GMAIL_PERSONAL_CLIENT_ID`, `GMAIL_PERSONAL_CLIENT_SECRET`, `GMAIL_PERSONAL_REFRESH_TOKEN`, `GMAIL_PERSONAL_EMAIL`
-* `GMAIL_LLN_CLIENT_ID`, `GMAIL_LLN_CLIENT_SECRET`, `GMAIL_LLN_REFRESH_TOKEN`, `GMAIL_LLN_EMAIL`
+* `GMAIL_SECONDARY_CLIENT_ID`, `GMAIL_SECONDARY_CLIENT_SECRET`, `GMAIL_SECONDARY_REFRESH_TOKEN`, `GMAIL_SECONDARY_EMAIL`
 
 Required iCloud variables:
 

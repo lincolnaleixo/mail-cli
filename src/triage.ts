@@ -25,7 +25,7 @@ import { homedir } from 'os';
 import { dirname, join } from 'path';
 import { gmailBackend } from './gmail';
 import { icloudInboxWithValidity } from './icloud';
-import { gmailLlnCreds, gmailPersonalCreds, icloudCreds } from './creds';
+import { gmailSecondaryCreds, gmailPersonalCreds, icloudCreds } from './creds';
 import type { Email } from './types';
 
 const STATE_PATH = join(
@@ -34,8 +34,8 @@ const STATE_PATH = join(
   'triage-state.json',
 );
 
-export type TriageAccount = 'gmail' | 'lln' | 'icloud';
-export const TRIAGE_ACCOUNTS: TriageAccount[] = ['gmail', 'lln', 'icloud'];
+export type TriageAccount = 'gmail' | 'secondary' | 'icloud';
+export const TRIAGE_ACCOUNTS: TriageAccount[] = ['gmail', 'secondary', 'icloud'];
 
 interface AccountState {
   lastSweep: string | null;
@@ -55,13 +55,13 @@ export function loadState(): TriageState {
   if (!existsSync(STATE_PATH)) {
     mkdirSync(dirname(STATE_PATH), { recursive: true });
     const initial: TriageState = {
-      email: { gmail: emptyAccount(), lln: emptyAccount(), icloud: emptyAccount() },
+      email: { gmail: emptyAccount(), secondary: emptyAccount(), icloud: emptyAccount() },
     };
     writeFileSync(STATE_PATH, `${JSON.stringify(initial, null, 2)}\n`, { mode: 0o600 });
     return initial;
   }
   const raw = JSON.parse(readFileSync(STATE_PATH, 'utf-8')) as TriageState;
-  raw.email ??= { gmail: emptyAccount(), lln: emptyAccount(), icloud: emptyAccount() };
+  raw.email ??= { gmail: emptyAccount(), secondary: emptyAccount(), icloud: emptyAccount() };
   for (const a of TRIAGE_ACCOUNTS) {
     raw.email[a] ??= emptyAccount();
     raw.email[a].processed ??= {};
@@ -109,7 +109,7 @@ export function markProcessed(account: TriageAccount, ids: string[]): { marked: 
 
 export interface SweepAccountResult {
   account: TriageAccount;
-  /** Messages in the inbox right now (icloud: exact; gmail/lln: what the capped fetch returned). */
+  /** Messages in the inbox right now (icloud: exact; gmail/secondary: what the capped fetch returned). */
   inboxTotal: number;
   /** Inbox items already routed in a previous triage (subtracted from items). */
   alreadyProcessed: number;
@@ -135,8 +135,8 @@ export async function sweep(limit: number): Promise<SweepAccountResult[]> {
       return { account: 'gmail', inboxTotal: emails.length, alreadyProcessed: 0, items: emails, capped: emails.length >= limit };
     })(),
     (async (): Promise<SweepAccountResult> => {
-      const emails = await gmailBackend('lln', gmailLlnCreds()).inbox(limit);
-      return { account: 'lln', inboxTotal: emails.length, alreadyProcessed: 0, items: emails, capped: emails.length >= limit };
+      const emails = await gmailBackend('secondary', gmailSecondaryCreds()).inbox(limit);
+      return { account: 'secondary', inboxTotal: emails.length, alreadyProcessed: 0, items: emails, capped: emails.length >= limit };
     })(),
     (async (): Promise<SweepAccountResult> => {
       const { uidValidity, inboxTotal, emails } = await icloudInboxWithValidity(icloudCreds(), limit);

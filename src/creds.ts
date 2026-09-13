@@ -3,7 +3,7 @@
 import type { GmailAccountCreds, ICloudCreds } from './types';
 
 let cachedGmailPersonal: GmailAccountCreds | null = null;
-let cachedGmailLln: GmailAccountCreds | null = null;
+let cachedGmailSecondary: GmailAccountCreds | null = null;
 let cachedIcloud: ICloudCreds | null = null;
 
 function required(name: string): string {
@@ -26,16 +26,16 @@ export function gmailPersonalCreds(): GmailAccountCreds {
   return cachedGmailPersonal;
 }
 
-export function gmailLlnCreds(): GmailAccountCreds {
-  if (!cachedGmailLln) {
-    cachedGmailLln = {
-      client_id: required('GMAIL_LLN_CLIENT_ID'),
-      client_secret: required('GMAIL_LLN_CLIENT_SECRET'),
-      refresh_token: required('GMAIL_LLN_REFRESH_TOKEN'),
-      email: required('GMAIL_LLN_EMAIL'),
+export function gmailSecondaryCreds(): GmailAccountCreds {
+  if (!cachedGmailSecondary) {
+    cachedGmailSecondary = {
+      client_id: required('GMAIL_SECONDARY_CLIENT_ID'),
+      client_secret: required('GMAIL_SECONDARY_CLIENT_SECRET'),
+      refresh_token: required('GMAIL_SECONDARY_REFRESH_TOKEN'),
+      email: required('GMAIL_SECONDARY_EMAIL'),
     };
   }
-  return cachedGmailLln;
+  return cachedGmailSecondary;
 }
 
 export function icloudCreds(): ICloudCreds {

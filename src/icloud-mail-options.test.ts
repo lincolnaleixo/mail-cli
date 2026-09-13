@@ -11,7 +11,7 @@ describe('mailOptions', () => {
 
   test('joins the References chain into one header value', () => {
     const opts = mailOptions({ ...base, references: ['<root@example.test>', '<parent@example.test>'] }, 'sender@example.test');
-    expect(opts.references).toBe('<root@x> <parent@x>');
+    expect(opts.references).toBe('<root@example.test> <parent@example.test>');
   });
 
   test('leaves threading fields undefined when absent', () => {
@@ -33,7 +33,7 @@ describe('mailOptions', () => {
     expect(opts).toMatchObject({
       from: 'sender@example.test',
       to: 'hotel@example.com',
-      cc: 'a@x.com',
+      cc: 'cc@example.test',
       subject: 'Booking',
       text: 'hi',
       html: '<p>hi</p>',
