@@ -7,7 +7,7 @@ const MESSAGE: OutgoingMessage = {
   to: 'someone@example.com',
   subject: 'Hello',
   body: 'Body',
-  from: 'lincoln@icloud.com',
+  from: 'sender@example.test',
   threadId: 'icloud-thread-1',
 };
 

@@ -3,8 +3,8 @@ import { cleanWhitespace, stripHtml } from './text';
 
 describe('stripHtml', () => {
   test('removes tags and leaves readable text', () => {
-    expect(stripHtml('<p>Dear Lincoln,</p><p>Check in is from 4pm.</p>')).toBe(
-      'Dear Lincoln,\nCheck in is from 4pm.',
+    expect(stripHtml('<p>Dear reader,</p><p>Check in is from 4pm.</p>')).toBe(
+      'Dear reader,\nCheck in is from 4pm.',
     );
   });
 
@@ -29,10 +29,10 @@ describe('stripHtml', () => {
 
   test('leaves no angle brackets from a full booking-mail layout', () => {
     const html = `<html><body bgcolor='#F1F0EE'><table bgcolor='#F1F0EE' border='0'>
-      <tr><td width='600'><p>Dear Lincoln Aleixo,</p>
+      <tr><td width='600'><p>Dear reader,</p>
       <p>We are looking forward to welcoming you.</p></td></tr></table></body></html>`;
     const out = stripHtml(html);
-    expect(out).toContain('Dear Lincoln Aleixo,');
+    expect(out).toContain('Dear reader,');
     expect(out).toContain('We are looking forward to welcoming you.');
     expect(out).not.toContain('<');
     expect(out).not.toContain('bgcolor');

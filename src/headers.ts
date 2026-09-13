@@ -69,8 +69,7 @@ export function foldHeader(name: string, value: string): string {
 }
 
 /**
- * Strip every leading reply/forward prefix. Covers the locales in Lincoln's
- * mail: English, Portuguese, and German.
+ * Strip every leading reply/forward prefix across common locales.
  */
 export function normalizeSubject(subject: string): string {
   return subject.replace(/^(\s*(re|fwd|fw|aw|wg|res|enc)\s*:\s*)+/i, '').trim();

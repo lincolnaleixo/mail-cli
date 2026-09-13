@@ -10,7 +10,7 @@ import type { ICloudCreds, OutgoingMessage } from './types';
  * Bcc list must survive into the copy while drafts still strip it.
  */
 const creds: ICloudCreds = {
-  email: 'me@icloud.com',
+  email: 'sender@example.test',
   imapServer: 'imap.mail.me.com',
   imapPort: 993,
   smtpServer: 'smtp.mail.me.com',
@@ -70,8 +70,8 @@ describe('iCloud Sent mailbox resolution', () => {
 
 describe('iCloud Sent copy MIME', () => {
   test('reuses the Message-ID from the SMTP send instead of minting a new one', async () => {
-    const mime = (await buildMime(base, { messageId: '<sent-123@icloud.com>' })).toString('utf-8');
-    expect(mime).toContain('Message-ID: <sent-123@icloud.com>');
+    const mime = (await buildMime(base, { messageId: '<sent-123@example.test>' })).toString('utf-8');
+    expect(mime).toContain('Message-ID: <sent-123@example.test>');
   });
 
   test('mints a Message-ID when none is supplied (the draft path)', async () => {

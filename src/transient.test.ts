@@ -27,7 +27,7 @@ describe('isTransientFailure', () => {
   test('never degrades an auth or configuration fault', () => {
     expect(isTransientFailure(Object.assign(new Error('Command failed'), { authenticationFailed: true }))).toBe(false);
     expect(isTransientFailure(new Error('Invalid credentials'))).toBe(false);
-    expect(isTransientFailure(new Error('missing ICLOUD_APP_PASSWORD; run through: system-vault run inbox_triage'))).toBe(false);
+    expect(isTransientFailure(new Error('missing required environment variable: ICLOUD_APP_PASSWORD'))).toBe(false);
     expect(isTransientFailure(new Error('icloud destination News does not exist'))).toBe(false);
     expect(isTransientFailure(new Error('Gmail user label "Newsletter" not found'))).toBe(false);
     expect(isTransientFailure(undefined)).toBe(false);

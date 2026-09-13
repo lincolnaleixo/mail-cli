@@ -9,7 +9,7 @@ function original(overrides: Partial<Email> = {}): Email {
     account: 'gmail',
     threadId: 'thread-abc',
     from: 'Hotel <hotel@example.com>',
-    to: 'lincolnmorais@gmail.com',
+    to: 'recipient@example.test',
     subject: 'Upcoming Stay',
     date: 'Fri, 31 Jul 2026 02:05:54 +0100',
     messageId: '<parent@example.com>',
