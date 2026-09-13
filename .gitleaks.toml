@@ -1,0 +1,7 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "private-key-block"
+description = "PEM private key block"
+regex = '''-----BEGIN (RSA |EC |OPENSSH |PGP |DSA )?PRIVATE KEY-----'''
